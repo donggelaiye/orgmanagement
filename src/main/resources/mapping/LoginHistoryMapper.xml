@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.LoginHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.LoginHistory">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="account_login" property="accountLogin" jdbcType="VARCHAR"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, account_login, last_login_time, is_delete, create_emp, create_time, modify_emp,
+    modify_time, remark
+  </sql>
+    <select id="selectByLoginAccount" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from t_b_login_history
+        where account_login = #{loginAccount}
+        and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.LoginHistory">
+    insert into t_b_login_history (id, account_login, last_login_time,
+      is_delete, create_emp, create_time,
+      modify_emp, modify_time, remark
+      )
+    values (#{id,jdbcType=BIGINT}, #{accountLogin,jdbcType=VARCHAR}, #{lastLoginTime,jdbcType=TIMESTAMP},
+      #{isDelete,jdbcType=TINYINT}, #{createEmp,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP},
+      #{modifyEmp,jdbcType=BIGINT}, #{modifyTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+      on duplicate key update
+        last_login_time = #{lastLoginTime},
+        modify_time = #{modifyTime},
+        modify_emp = #{modifyEmp}
+  </insert>
+    <insert id="insertFirstTimeLoginInfo">
+    insert into t_b_login_history (id, account_login, last_login_time,
+      is_delete, create_emp, create_time,
+      modify_emp, modify_time, remark
+      )
+    values (null, #{loginAccount}, NOW(),
+      ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}, #{createEmpId}, NOW(),
+      #{createEmpId}, NOW(), null
+      )
+    </insert>
+    <update id="updateByLoginAccount" parameterType="com.ucarinc.orgmanagement.entity.LoginHistory">
+    update t_b_login_history
+    set account_login = #{accountLogin,jdbcType=VARCHAR},
+      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_emp = #{createEmp,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where account_login = #{accountLogin,jdbcType=BIGINT}
+  </update>
+    <update id="updateLastLoginTimeByLoginAccount">
+    update t_b_login_history
+    set last_login_time = NOW(),
+      modify_emp = #{modifyEmpId},
+      modify_time = NOW(),
+    where account_login = #{loginAccount}
+    </update>
+</mapper>

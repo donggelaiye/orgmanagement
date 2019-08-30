@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.HistoryMapper" >
+  <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.History" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="emp_id" property="empId" jdbcType="BIGINT" />
+    <result column="data_permission" property="dataPermission" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="operate_type" property="operateType" jdbcType="TINYINT" />
+    <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, emp_id, data_permission, status, operate_type, modify_emp, modify_time,
+    remark
+  </sql>
+  <sql id="Column_List" >
+    h.id, h.emp_id, h.data_permission, h.status, h.operate_type, h.modify_emp, h.modify_time,
+    h.remark,e.emp_name
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_b_operate_history
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_b_operate_history
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.History" >
+    insert into t_b_operate_history (id, emp_id,
+      data_permission, status, operate_type, 
+      modify_emp, modify_time, remark
+      )
+    values (#{id,jdbcType=BIGINT}, #{empId,jdbcType=BIGINT},  #{dataPermission,jdbcType=TINYINT},
+    #{status,jdbcType=TINYINT}, #{operateType,jdbcType=TINYINT},
+      #{modifyEmp,jdbcType=BIGINT}, #{modifyTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.ucarinc.orgmanagement.entity.History" >
+    insert into t_b_operate_history
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="empId != null" >
+        emp_id,
+      </if>
+      <if test="dataPermission != null" >
+        data_permission,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="operateType != null" >
+        operate_type,
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp,
+      </if>
+        modify_time,
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="empId != null" >
+        #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="dataPermission != null" >
+        #{dataPermission,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="operateType != null" >
+        #{operateType,jdbcType=TINYINT},
+      </if>
+      <if test="modifyEmp != null" >
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+       current_time
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.ucarinc.orgmanagement.entity.History" >
+    update t_b_operate_history
+    <set >
+      <if test="empId != null" >
+        emp_id = #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="dataPermission != null" >
+        data_permission = #{dataPermission,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="operateType != null" >
+        operate_type = #{operateType,jdbcType=TINYINT},
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.ucarinc.orgmanagement.entity.History" >
+    update t_b_operate_history
+    set emp_id = #{empId,jdbcType=BIGINT},
+      data_permission = #{dataPermission,jdbcType=TINYINT},
+      status = #{status,jdbcType=TINYINT},
+      operate_type = #{operateType,jdbcType=TINYINT},
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectAllHistory" resultType="com.ucarinc.orgmanagement.entity.History">
+    select
+    <include refid="Column_List" />
+    from t_b_operate_history h
+    left join t_b_employee e on h.emp_id = e.emp_id
+    order by h.modify_time desc
+  </select>
+
+</mapper>

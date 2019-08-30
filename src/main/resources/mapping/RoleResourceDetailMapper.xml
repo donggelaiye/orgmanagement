@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleResourceDetailMapper" >
+
+  <!-- 角色权限的查询 -->
+  <select id="getRoleResourceList" parameterType="com.ucarinc.orgmanagement.entity.form.RoleResourceForm" resultType="com.ucarinc.orgmanagement.entity.form.RoleResourceForm">
+    SELECT
+    trole.role_id,
+    trole.role_name,
+    trole.bussiness_line_name,
+    r.approve_account,
+    trole.approve_id,
+    r.approve_name,
+    r.approve_department approve_dept_name,
+    rr.resource_id_str,
+    r.status
+    FROM
+    (
+    SELECT
+    GROUP_CONCAT(resource_id SEPARATOR ';') as resource_id_str,
+    role_id
+    FROM
+    t_r_role_resource rr1,
+    (
+    SELECT
+    distinct (role_id) as role_id2
+    FROM
+    t_r_role_resource
+    <where>
+      <if test="resourceId != null" >
+        resource_id = #{resourceId}
+      </if>
+    </where>
+
+    ) AS rr2
+    WHERE
+    rr1.role_id = rr2.role_id2
+    GROUP BY
+    role_id
+    ) AS rr
+    LEFT JOIN (
+    SELECT
+    r.role_id role_id,
+    r.role_name,
+    rl.bussiness_line_id,
+    r.approve_id,
+    GROUP_CONCAT(bl.bussiness_line_name) AS bussiness_line_name
+    FROM
+    t_b_role r
+    LEFT JOIN t_r_role_line rl ON r.role_id = rl.role_id
+    LEFT JOIN t_b_bussiness_line bl ON bl.bussiness_line_id = rl.bussiness_line_id
+    GROUP BY
+    r.role_id
+    ) AS trole ON rr.role_id = trole.role_id
+    LEFT JOIN t_b_role r ON r.role_id = trole.role_id
+<where>
+  <if test="roleName != null and roleName != ''" >
+    and  trole.role_name like concat(#{roleName},'%')
+  </if>
+  <if test="bussinessLineName != null and bussinessLineName != ''" >
+    and trole.bussiness_line_name LIKE CONCAT('%',#{bussinessLineName},'%')
+  </if>
+  <if test="approveAccount != null and approveAccount != ''" >
+    and r.approve_account like concat(#{approveAccount},'%')
+  </if>
+  <if test="approveId != null and approveId != ''" >
+    and trole.approve_id like concat(#{approveId},'%')
+  </if>
+  <if test="approveName != null and approveName != ''" >
+    and r.approve_name like concat(#{approveName},'%')
+  </if>
+  <if test="approveDeptName != null and approveDeptName != ''" >
+    and r.approve_department = #{approveDeptName}
+  </if>
+  <if test="status != null ">
+    and r.status = #{status}
+  </if>
+    and r.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+</where>
+
+    GROUP BY trole.role_id
+  </select>
+
+</mapper>

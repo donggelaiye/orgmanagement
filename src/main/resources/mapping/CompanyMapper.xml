@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.CompanyMapper" >
+  <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.Company" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="co_name" property="coName" jdbcType="VARCHAR" />
+    <result column="co_credit_code" property="coCreditCode" jdbcType="VARCHAR" />
+    <result column="co_type" property="coType" jdbcType="TINYINT" />
+    <result column="business_time" property="businessTime" jdbcType="DATE" />
+    <result column="co_address" property="coAddress" jdbcType="VARCHAR" />
+    <result column="business_scope" property="businessScope" jdbcType="VARCHAR" />
+    <result column="legal_representative" property="legalRepresentative" jdbcType="VARCHAR" />
+    <result column="registered_capital" property="registeredCapital" jdbcType="VARCHAR" />
+    <result column="set_date" property="setDate" jdbcType="DATE" />
+    <result column="registered_authority" property="registeredAuthority" jdbcType="VARCHAR" />
+    <result column="approval_date" property="approvalDate" jdbcType="DATE" />
+    <result column="registered_status" property="registeredStatus" jdbcType="VARCHAR" />
+    <result column="business_license" property="businessLicense" jdbcType="VARCHAR" />
+    <result column="co_nature" property="coNature" jdbcType="TINYINT" />
+    <result column="registered_address" property="registeredAddress" jdbcType="VARCHAR" />
+    <result column="open_bank" property="openBank" jdbcType="VARCHAR" />
+    <result column="co_account" property="coAccount" jdbcType="VARCHAR" />
+    <result column="registered_phone" property="registeredPhone" jdbcType="BIGINT" />
+    <result column="co_mark" property="coMark" jdbcType="TINYINT" />
+    <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="create_emp" property="createEmp" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, co_name, co_credit_code, co_type, business_time, co_address, business_scope, 
+    legal_representative, registered_capital, set_date, registered_authority, approval_date, 
+    registered_status, business_license, co_nature, registered_address, open_bank, co_account, 
+    registered_phone, co_mark, modify_emp, create_time, modify_time, remark, is_delete, 
+    create_emp, status
+  </sql>
+    <select id="selectByDeptId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" /> from t_b_company where co_credit_code in (SELECT
+        co_credit_code
+        from t_r_dept_company
+        where dept_id = #{deptId})
+    </select>
+  <select id="selectNotInDeptId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" /> from t_b_company where co_credit_code not in (SELECT
+        co_credit_code
+        from t_r_dept_company
+        where dept_id = #{deptId}
+    )
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ucarinc.orgmanagement.entity.example.CompanyExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_b_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_b_company
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_b_company
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ucarinc.orgmanagement.entity.example.CompanyExample" >
+    delete from t_b_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.Company" >
+    insert into t_b_company (id, co_name, co_credit_code, 
+      co_type, business_time, co_address, 
+      business_scope, legal_representative, registered_capital, 
+      set_date, registered_authority, approval_date, 
+      registered_status, business_license, co_nature, 
+      registered_address, open_bank, co_account, 
+      registered_phone, co_mark, modify_emp, 
+      create_time, modify_time, remark, 
+      is_delete, create_emp, status
+      )
+    values (#{id,jdbcType=BIGINT}, #{coName,jdbcType=VARCHAR}, #{coCreditCode,jdbcType=VARCHAR}, 
+      #{coType,jdbcType=TINYINT}, #{businessTime,jdbcType=DATE}, #{coAddress,jdbcType=VARCHAR}, 
+      #{businessScope,jdbcType=VARCHAR}, #{legalRepresentative,jdbcType=VARCHAR}, #{registeredCapital,jdbcType=VARCHAR}, 
+      #{setDate,jdbcType=DATE}, #{registeredAuthority,jdbcType=VARCHAR}, #{approvalDate,jdbcType=DATE}, 
+      #{registeredStatus,jdbcType=VARCHAR}, #{businessLicense,jdbcType=VARCHAR}, #{coNature,jdbcType=TINYINT}, 
+      #{registeredAddress,jdbcType=VARCHAR}, #{openBank,jdbcType=VARCHAR}, #{coAccount,jdbcType=VARCHAR}, 
+      #{registeredPhone,jdbcType=BIGINT}, #{coMark,jdbcType=TINYINT}, #{modifyEmp,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{isDelete,jdbcType=TINYINT}, #{createEmp,jdbcType=BIGINT}, #{status,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ucarinc.orgmanagement.entity.Company" >
+    insert into t_b_company
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="coName != null" >
+        co_name,
+      </if>
+      <if test="coCreditCode != null" >
+        co_credit_code,
+      </if>
+      <if test="coType != null" >
+        co_type,
+      </if>
+      <if test="businessTime != null" >
+        business_time,
+      </if>
+      <if test="coAddress != null" >
+        co_address,
+      </if>
+      <if test="businessScope != null" >
+        business_scope,
+      </if>
+      <if test="legalRepresentative != null" >
+        legal_representative,
+      </if>
+      <if test="registeredCapital != null" >
+        registered_capital,
+      </if>
+      <if test="setDate != null" >
+        set_date,
+      </if>
+      <if test="registeredAuthority != null" >
+        registered_authority,
+      </if>
+      <if test="approvalDate != null" >
+        approval_date,
+      </if>
+      <if test="registeredStatus != null" >
+        registered_status,
+      </if>
+      <if test="businessLicense != null" >
+        business_license,
+      </if>
+      <if test="coNature != null" >
+        co_nature,
+      </if>
+      <if test="registeredAddress != null" >
+        registered_address,
+      </if>
+      <if test="openBank != null" >
+        open_bank,
+      </if>
+      <if test="coAccount != null" >
+        co_account,
+      </if>
+      <if test="registeredPhone != null" >
+        registered_phone,
+      </if>
+      <if test="coMark != null" >
+        co_mark,
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="createEmp != null" >
+        create_emp,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="coName != null" >
+        #{coName,jdbcType=VARCHAR},
+      </if>
+      <if test="coCreditCode != null" >
+        #{coCreditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="coType != null" >
+        #{coType,jdbcType=TINYINT},
+      </if>
+      <if test="businessTime != null" >
+        #{businessTime,jdbcType=DATE},
+      </if>
+      <if test="coAddress != null" >
+        #{coAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="businessScope != null" >
+        #{businessScope,jdbcType=VARCHAR},
+      </if>
+      <if test="legalRepresentative != null" >
+        #{legalRepresentative,jdbcType=VARCHAR},
+      </if>
+      <if test="registeredCapital != null" >
+        #{registeredCapital,jdbcType=VARCHAR},
+      </if>
+      <if test="setDate != null" >
+        #{setDate,jdbcType=DATE},
+      </if>
+      <if test="registeredAuthority != null" >
+        #{registeredAuthority,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        #{approvalDate,jdbcType=DATE},
+      </if>
+      <if test="registeredStatus != null" >
+        #{registeredStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="businessLicense != null" >
+        #{businessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="coNature != null" >
+        #{coNature,jdbcType=TINYINT},
+      </if>
+      <if test="registeredAddress != null" >
+        #{registeredAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="openBank != null" >
+        #{openBank,jdbcType=VARCHAR},
+      </if>
+      <if test="coAccount != null" >
+        #{coAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="registeredPhone != null" >
+        #{registeredPhone,jdbcType=BIGINT},
+      </if>
+      <if test="coMark != null" >
+        #{coMark,jdbcType=TINYINT},
+      </if>
+      <if test="modifyEmp != null" >
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createEmp != null" >
+        #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ucarinc.orgmanagement.entity.example.CompanyExample" resultType="java.lang.Integer" >
+    select count(*) from t_b_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_b_company
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.coName != null" >
+        co_name = #{record.coName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coCreditCode != null" >
+        co_credit_code = #{record.coCreditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coType != null" >
+        co_type = #{record.coType,jdbcType=TINYINT},
+      </if>
+      <if test="record.businessTime != null" >
+        business_time = #{record.businessTime,jdbcType=DATE},
+      </if>
+      <if test="record.coAddress != null" >
+        co_address = #{record.coAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.businessScope != null" >
+        business_scope = #{record.businessScope,jdbcType=VARCHAR},
+      </if>
+      <if test="record.legalRepresentative != null" >
+        legal_representative = #{record.legalRepresentative,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registeredCapital != null" >
+        registered_capital = #{record.registeredCapital,jdbcType=VARCHAR},
+      </if>
+      <if test="record.setDate != null" >
+        set_date = #{record.setDate,jdbcType=DATE},
+      </if>
+      <if test="record.registeredAuthority != null" >
+        registered_authority = #{record.registeredAuthority,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approvalDate != null" >
+        approval_date = #{record.approvalDate,jdbcType=DATE},
+      </if>
+      <if test="record.registeredStatus != null" >
+        registered_status = #{record.registeredStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.businessLicense != null" >
+        business_license = #{record.businessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coNature != null" >
+        co_nature = #{record.coNature,jdbcType=TINYINT},
+      </if>
+      <if test="record.registeredAddress != null" >
+        registered_address = #{record.registeredAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.openBank != null" >
+        open_bank = #{record.openBank,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coAccount != null" >
+        co_account = #{record.coAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registeredPhone != null" >
+        registered_phone = #{record.registeredPhone,jdbcType=BIGINT},
+      </if>
+      <if test="record.coMark != null" >
+        co_mark = #{record.coMark,jdbcType=TINYINT},
+      </if>
+      <if test="record.modifyEmp != null" >
+        modify_emp = #{record.modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifyTime != null" >
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isDelete != null" >
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.createEmp != null" >
+        create_emp = #{record.createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_b_company
+    set id = #{record.id,jdbcType=BIGINT},
+      co_name = #{record.coName,jdbcType=VARCHAR},
+      co_credit_code = #{record.coCreditCode,jdbcType=VARCHAR},
+      co_type = #{record.coType,jdbcType=TINYINT},
+      business_time = #{record.businessTime,jdbcType=DATE},
+      co_address = #{record.coAddress,jdbcType=VARCHAR},
+      business_scope = #{record.businessScope,jdbcType=VARCHAR},
+      legal_representative = #{record.legalRepresentative,jdbcType=VARCHAR},
+      registered_capital = #{record.registeredCapital,jdbcType=VARCHAR},
+      set_date = #{record.setDate,jdbcType=DATE},
+      registered_authority = #{record.registeredAuthority,jdbcType=VARCHAR},
+      approval_date = #{record.approvalDate,jdbcType=DATE},
+      registered_status = #{record.registeredStatus,jdbcType=VARCHAR},
+      business_license = #{record.businessLicense,jdbcType=VARCHAR},
+      co_nature = #{record.coNature,jdbcType=TINYINT},
+      registered_address = #{record.registeredAddress,jdbcType=VARCHAR},
+      open_bank = #{record.openBank,jdbcType=VARCHAR},
+      co_account = #{record.coAccount,jdbcType=VARCHAR},
+      registered_phone = #{record.registeredPhone,jdbcType=BIGINT},
+      co_mark = #{record.coMark,jdbcType=TINYINT},
+      modify_emp = #{record.modifyEmp,jdbcType=BIGINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      create_emp = #{record.createEmp,jdbcType=BIGINT},
+      status = #{record.status,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ucarinc.orgmanagement.entity.Company" >
+    update t_b_company
+    <set >
+      <if test="coName != null" >
+        co_name = #{coName,jdbcType=VARCHAR},
+      </if>
+      <if test="coCreditCode != null" >
+        co_credit_code = #{coCreditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="coType != null" >
+        co_type = #{coType,jdbcType=TINYINT},
+      </if>
+      <if test="businessTime != null" >
+        business_time = #{businessTime,jdbcType=DATE},
+      </if>
+      <if test="coAddress != null" >
+        co_address = #{coAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="businessScope != null" >
+        business_scope = #{businessScope,jdbcType=VARCHAR},
+      </if>
+      <if test="legalRepresentative != null" >
+        legal_representative = #{legalRepresentative,jdbcType=VARCHAR},
+      </if>
+      <if test="registeredCapital != null" >
+        registered_capital = #{registeredCapital,jdbcType=VARCHAR},
+      </if>
+      <if test="setDate != null" >
+        set_date = #{setDate,jdbcType=DATE},
+      </if>
+      <if test="registeredAuthority != null" >
+        registered_authority = #{registeredAuthority,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        approval_date = #{approvalDate,jdbcType=DATE},
+      </if>
+      <if test="registeredStatus != null" >
+        registered_status = #{registeredStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="businessLicense != null" >
+        business_license = #{businessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="coNature != null" >
+        co_nature = #{coNature,jdbcType=TINYINT},
+      </if>
+      <if test="registeredAddress != null" >
+        registered_address = #{registeredAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="openBank != null" >
+        open_bank = #{openBank,jdbcType=VARCHAR},
+      </if>
+      <if test="coAccount != null" >
+        co_account = #{coAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="registeredPhone != null" >
+        registered_phone = #{registeredPhone,jdbcType=BIGINT},
+      </if>
+      <if test="coMark != null" >
+        co_mark = #{coMark,jdbcType=TINYINT},
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createEmp != null" >
+        create_emp = #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ucarinc.orgmanagement.entity.Company" >
+    update t_b_company
+    set co_name = #{coName,jdbcType=VARCHAR},
+      co_credit_code = #{coCreditCode,jdbcType=VARCHAR},
+      co_type = #{coType,jdbcType=TINYINT},
+      business_time = #{businessTime,jdbcType=DATE},
+      co_address = #{coAddress,jdbcType=VARCHAR},
+      business_scope = #{businessScope,jdbcType=VARCHAR},
+      legal_representative = #{legalRepresentative,jdbcType=VARCHAR},
+      registered_capital = #{registeredCapital,jdbcType=VARCHAR},
+      set_date = #{setDate,jdbcType=DATE},
+      registered_authority = #{registeredAuthority,jdbcType=VARCHAR},
+      approval_date = #{approvalDate,jdbcType=DATE},
+      registered_status = #{registeredStatus,jdbcType=VARCHAR},
+      business_license = #{businessLicense,jdbcType=VARCHAR},
+      co_nature = #{coNature,jdbcType=TINYINT},
+      registered_address = #{registeredAddress,jdbcType=VARCHAR},
+      open_bank = #{openBank,jdbcType=VARCHAR},
+      co_account = #{coAccount,jdbcType=VARCHAR},
+      registered_phone = #{registeredPhone,jdbcType=BIGINT},
+      co_mark = #{coMark,jdbcType=TINYINT},
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_emp = #{createEmp,jdbcType=BIGINT},
+      status = #{status,jdbcType=TINYINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

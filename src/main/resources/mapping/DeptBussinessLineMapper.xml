@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.DeptBussinessLineMapper" >
+  <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.DeptBussinessLine" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+    <result column="bussiness_line_id" property="bussinessLineId" jdbcType="TINYINT" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="create_emp" property="createEmp" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, dept_id, bussiness_line_id, is_delete, create_emp, create_time, modify_emp, modify_time, 
+    remark
+  </sql>
+
+  <!-- 插入部门关联的业务线 -->
+  <insert id="insertDeptBussinessLine" parameterType="com.ucarinc.orgmanagement.entity.DeptBussinessLine" >
+    insert into t_r_dept_bussiness_line
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="deptId != null" >
+        dept_id,
+      </if>
+      <if test="bussinessLineId != null" >
+        bussiness_line_id,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="createEmp != null" >
+        create_emp,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="deptId != null" >
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="bussinessLineId != null" >
+        #{bussinessLineId,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createEmp != null" >
+        #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyEmp != null" >
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <!-- 删除关联业务线 -->
+  <delete id="removeDeptBussinessLine" parameterType="com.ucarinc.orgmanagement.entity.DeptBussinessLine" >
+    delete from t_r_dept_bussiness_line
+    where bussiness_line_id = #{bussinessLineId,jdbcType=BIGINT} and dept_id = #{deptId,jdbcType=VARCHAR}
+  </delete>
+
+  <!-- 通过部门id获取部门关联业务线 -->
+  <select id="getDeptBussinessLineListByDeptId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select <include refid="Base_Column_List" />
+    from t_r_dept_bussiness_line
+    where dept_id = #{deptId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 逻辑删除部门关联的业务线，将is_delete 字段置为1 -->
+  <update id="deleteDeptBussinessList" parameterType="java.lang.String">
+    update t_r_dept_bussiness_line set is_delete = 1
+    where dept_id = #{deptId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getBussinessLineGroop" resultType="java.lang.Integer">
+    select bussiness_line_id from t_r_dept_bussiness_line
+    where dept_id in
+    <foreach collection="list" item="deptId" index="index"
+             open="(" close=")" separator=",">
+      #{deptId}
+    </foreach>
+    group by bussiness_line_id
+  </select>
+
+</mapper>

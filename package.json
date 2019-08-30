@@ -1,0 +1,27 @@
+{
+  "name": "orgmanagement",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.10101111.com:trainning/sysadmin-zsf/orgmanagement.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "file-saver": "^2.0.2",
+    "js-md5": "^0.7.3",
+    "xlsx": "^0.15.0"
+  },
+  "devDependencies": {
+    "script-loader": "^0.7.2"
+  }
+}

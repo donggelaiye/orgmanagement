@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleAccountDetailMapper" >
+  <!-- 获取角色账户明细数据集合 -->
+<!--  <select id="getRoleAccountList" resultType="com.ucarinc.orgmanagement.entity.RoleAccountDetail" parameterType="com.ucarinc.orgmanagement.entity.RoleAccountDetail" >-->
+<!--    select-->
+<!--    r.role_id,r.status as roleStatus,r.role_name,GROUP_CONCAT(bl.bussiness_line_name) AS bussinessLineName,a.account_login,a.status as accountStatus,e.emp_id,e.emp_name,e.emp_depart-->
+<!--    from t_b_role r left join t_r_role_line rl on r.role_id = rl.role_id-->
+<!--    left join t_b_bussiness_line bl on bl.bussiness_line_id = rl.bussiness_line_id-->
+<!--    left join t_r_account_role ar on r.role_id = ar.role_id-->
+<!--    left join t_b_account a on ar.account_login = a.account_login-->
+<!--    left join t_b_employee e on e.emp_id = a.emp_id-->
+<!--    <where>-->
+<!--      <if test="roleId != null and roleId !=''">-->
+<!--        and r.role_id = #{roleId}-->
+<!--      </if>-->
+<!--      <if test="roleStatus != null ">-->
+<!--        and r.status = #{roleStatus},'%')-->
+<!--      </if>-->
+<!--      <if test="roleName != null and roleName !=''">-->
+<!--        and r.role_name LIKE CONCAT(#{roleName},'%')-->
+<!--      </if>-->
+<!--      <if test="bussinessLineId != null and bussinessLineId !=''">-->
+<!--        and rl.bussiness_line_id = #{bussinessLineId}-->
+<!--      </if>-->
+<!--      <if test="accountLogin != null and accountLogin !=''">-->
+<!--        and a.account_login LIKE CONCAT(#{accountLogin},'%')-->
+<!--      </if>-->
+<!--      <if test="accountStatus != null ">-->
+<!--        and a.status = #{accountStatus}-->
+<!--      </if>-->
+<!--      <if test="empId != null">-->
+<!--        and e.emp_id LIKE CONCAT(#{empId},'%')-->
+<!--      </if>-->
+<!--      <if test="empName != null and empName !=''">-->
+<!--        and e.emp_name LIKE CONCAT(#{empName},'%')-->
+<!--      </if>-->
+<!--      <if test="empDepart != null and empDepart !=''">-->
+<!--        and e.emp_depart = #{empDepart}-->
+<!--      </if>-->
+<!--      and r.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}-->
+<!--      and rl.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}-->
+<!--      and ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}-->
+<!--      and a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}-->
+<!--      and e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}-->
+<!--    </where>-->
+<!--    order by r.role_id-->
+<!--  </select> -->
+  <!-- 获取角色账户明细数据集合 -->
+  <select id="getRoleAccountList" resultType="com.ucarinc.orgmanagement.entity.RoleAccountDetail" parameterType="com.ucarinc.orgmanagement.entity.RoleAccountDetail" >
+    SELECT
+    ar.account_login,
+    trole.*, acc.emp_id AS emp_id,
+    acc.`status` accountStatus,
+    e.emp_name,
+    d.dept_name as departName
+    FROM
+    t_r_account_role ar
+    LEFT JOIN (
+    SELECT
+    r.role_id role_id,
+    r.role_name,
+    r.status as roleStatus,
+    r.is_delete as rDelete,
+    rl.is_delete as rlDelete,
+    bl.is_delete as blDelete,
+    GROUP_CONCAT(bl.bussiness_line_name) AS bussiness_line_name
+    FROM
+    t_b_role r
+    LEFT JOIN t_r_role_line rl ON r.role_id = rl.role_id
+    LEFT JOIN t_b_bussiness_line bl ON bl.bussiness_line_id = rl.bussiness_line_id
+    GROUP BY
+    r.role_id
+    ) AS trole ON ar.role_id = trole.role_id
+    LEFT JOIN t_b_account acc ON acc.account_login = ar.account_login
+    LEFT JOIN t_b_employee e ON e.emp_id = acc.emp_id
+    LEFT JOIN t_b_dept d ON d.dept_id = e.emp_depart
+    <where>
+      <if test="roleId != null and roleId !=''">
+        and trole.role_id = #{roleId}
+      </if>
+      <if test="roleStatus != null ">
+        and trole.roleStatus = #{roleStatus}
+      </if>
+      <if test="roleName != null and roleName !=''">
+        and trole.role_name LIKE CONCAT(#{roleName},'%')
+      </if>
+      <if test="bussinessLineName != null and bussinessLineName !=''">
+        and trole.bussiness_line_name LIKE CONCAT('%',#{bussinessLineName},'%')
+      </if>
+      <if test="accountLogin != null and accountLogin !=''">
+        and acc.account_login LIKE CONCAT(#{accountLogin},'%')
+      </if>
+      <if test="accountStatus != null ">
+        and acc.status = #{accountStatus}
+      </if>
+      <if test="empId != null">
+        and e.emp_id LIKE CONCAT(#{empId},'%')
+      </if>
+      <if test="empName != null and empName !=''">
+        and e.emp_name LIKE CONCAT(#{empName},'%')
+      </if>
+      <if test="departName != null and departName !=''">
+        and d.dept_name = #{departName}
+      </if>
+      and trole.rDelete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and trole.rlDelete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and trole.blDelete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and acc.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      and d.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </where>
+    order by trole.role_id desc,ar.modify_time desc
+  </select>
+
+</mapper>

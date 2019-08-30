@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleResourceMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.RoleResource">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, role_id, resource_id, is_delete, create_time, create_emp, modify_time, modify_emp,
+        remark
+    </sql>
+    <insert id="batchInsert">
+        insert into t_r_role_resource (role_id, resource_id,
+        is_delete, create_time, create_emp,
+        modify_time, modify_emp, remark
+        )
+        values
+        <foreach collection="roleResourceList" item="itm" separator=",">
+            (
+            #{itm.roleId,jdbcType=BIGINT}, #{itm.resourceId,jdbcType=BIGINT},
+            #{itm.isDelete,jdbcType=TINYINT}, #{itm.createTime,jdbcType=TIMESTAMP}, #{itm.createEmp,jdbcType=BIGINT},
+            #{itm.modifyTime,jdbcType=TIMESTAMP}, #{itm.modifyEmp,jdbcType=BIGINT}, #{itm.remark,jdbcType=VARCHAR}
+            )
+        </foreach>
+        on duplicate key update
+        is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO},
+        modify_time = NOW(),
+        modify_emp = #{modifyEmpId}
+    </insert>
+    <update id="batchLogicalDelete">
+        update t_r_role_resource
+        set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES},
+        modify_emp = #{modifyEmpId},
+        modify_time = NOW()
+        where role_id = #{roleId} and resource_id in
+        <foreach collection="resourceIdList" item="resourceId" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
+    </update>
+    <select id="selectResourceIdByRoleId" resultType="java.lang.Long">
+        select rr.resource_id from t_r_role_resource rr
+        join t_b_resource r on rr.resource_id = r.resource_id
+        where rr.role_id = #{roleId} and rr.is_delete =
+        ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+</mapper>

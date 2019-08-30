@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.AccountResourceMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.AccountResource">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="account_login" property="accountLogin" jdbcType="VARCHAR"/>
+        <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, account_login, resource_id, is_delete, create_emp, create_time, modify_emp, modify_time,
+    remark
+  </sql>
+    <insert id="batchInsert">
+        insert into t_r_account_resource (id, account_login, resource_id,
+        is_delete, create_emp, create_time,
+        modify_emp, modify_time, remark
+        )
+        values
+        <foreach collection="accountResourceList" item="itm" separator=",">
+            (
+            #{itm.id,jdbcType=BIGINT}, #{itm.accountLogin,jdbcType=VARCHAR}, #{itm.resourceId,jdbcType=BIGINT},
+            #{itm.isDelete,jdbcType=TINYINT}, #{itm.createEmp,jdbcType=BIGINT}, #{itm.createTime,jdbcType=TIMESTAMP},
+            #{itm.modifyEmp,jdbcType=BIGINT}, #{itm.modifyTime,jdbcType=TIMESTAMP}, #{itm.remark,jdbcType=VARCHAR}
+            )
+        </foreach>
+        on duplicate key update
+        is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO},
+        modify_time = NOW(),
+        modify_emp = #{modifyEmpId}
+    </insert>
+    <update id="batchLogicalDelete">
+        update t_r_account_resource
+        set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES},
+        modify_emp = #{modifyEmpId},
+        modify_time = NOW()
+        WHERE account_login = #{loginAccount}
+        and resource_id in (
+        <foreach collection="resourceIdList" item="resourceId" separator=",">
+            #{resourceId}
+        </foreach>
+        )
+    </update>
+    <select id="selectAccountPermissionCodeByLoginAccount" resultType="java.lang.String">
+        select r.permission_code from t_r_account_resource ar
+        join t_b_resource r on ar.resource_id = r.resource_id
+        where ar.account_login = #{loginAccount} and ar.is_delete =
+        ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectAccountResourceIdByLoginAccount" resultType="java.lang.String">
+        select r.resource_id from t_r_account_resource ar
+        join t_b_resource r on ar.resource_id = r.resource_id
+        where ar.account_login = #{loginAccount} and ar.is_delete =
+        ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectAccountResourceByLoginAccount" resultType="com.ucarinc.orgmanagement.entity.Resource">
+        SELECT res.`permission_code`,res.menu_code,res.parent_id FROM t_b_account a
+        JOIN t_r_account_resource ar ON a.account_login = ar.account_login
+        JOIN t_b_resource res ON ar.`resource_id` = res.`resource_id`
+        WHERE a.account_login = #{loginAccount}
+        AND a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        AND ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        AND res.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+</mapper>

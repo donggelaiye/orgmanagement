@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.ResourceMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.Resource">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+        <result column="menu_code" property="menuCode" jdbcType="VARCHAR"/>
+        <result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+        <result column="permission_name" property="permissionName" jdbcType="VARCHAR"/>
+        <result column="permission_code" property="permissionCode" jdbcType="VARCHAR"/>
+        <result column="resource_url" property="resourceUrl" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="resource_type" property="resourceType" jdbcType="TINYINT"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, resource_id, menu_code, menu_name, permission_name, permission_code, resource_url,
+    parent_id, is_delete, resource_type, create_emp, create_time, modify_emp, modify_time,
+    remark
+  </sql>
+    <select id="selectAccountPermissionCodeListByLoginAccount" resultType="java.lang.String">
+     SELECT res.`permission_code` FROM t_b_account a
+        JOIN t_r_account_role ar ON a.account_login = ar.account_login
+        JOIN t_b_role r ON ar.`role_id` = r.`role_id`
+        JOIN t_r_role_resource rr ON r.`role_id` = rr.`role_id`
+        JOIN t_b_resource res ON rr.`resource_id` = res.`resource_id`
+        WHERE a.account_login = #{loginAccount}
+        and a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and r.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and rr.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and res.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectMenuCodeAndPermissionCodeByLoginAccount" resultType="com.ucarinc.orgmanagement.entity.Resource">
+        SELECT res.`permission_code`,res.menu_code,res.parent_id FROM t_b_account a
+        JOIN t_r_account_role ar ON a.account_login = ar.account_login
+        JOIN t_b_role r ON ar.`role_id` = r.`role_id`
+        JOIN t_r_role_resource rr ON r.`role_id` = rr.`role_id`
+        JOIN t_b_resource res ON rr.`resource_id` = res.`resource_id`
+        WHERE a.account_login = #{loginAccount}
+        and a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and r.status = 1
+        and r.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and rr.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and res.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectAllResource" resultType="com.ucarinc.orgmanagement.entity.Resource">
+        SELECT res.resource_id,res.permission_code,res.permission_name,res.parent_id FROM t_b_resource res
+        WHERE res.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectResource" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from t_b_resource
+        where is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+    <select id="selectResourceByResourceIdList" resultType="com.ucarinc.orgmanagement.entity.Resource">
+        select
+        <include refid="Base_Column_List" />
+        from t_b_resource
+        where is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and resource_id in
+        <foreach collection="resourceIdList" item="resourceId" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
+    </select>
+</mapper>

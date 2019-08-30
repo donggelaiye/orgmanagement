@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleApplyAccountMapper" >
+  <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="apply_code" property="applyCode" jdbcType="CHAR" />
+    <result column="apply_account" property="applyAccount" jdbcType="VARCHAR" />
+    <result column="emp_name" property="empName" jdbcType="VARCHAR" />
+    <result column="emp_id" property="empId" jdbcType="BIGINT" />
+    <result column="emp_dept" property="empDept" jdbcType="VARCHAR" />
+    <result column="operate_type" property="operateType" jdbcType="TINYINT" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_emp" property="createEmp" jdbcType="BIGINT" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, apply_code, apply_account, emp_name, emp_id, emp_dept, operate_type, is_delete, 
+    create_time, create_emp, modify_time, modify_emp, remark
+  </sql>
+
+  <select id="getAccountListByApplyCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from t_r_role_apply_account
+    where apply_code = #{apply_code,jdbcType=VARCHAR} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+
+  <update id="deleteAccount" parameterType="java.lang.String" >
+    update t_r_role_apply_account
+    set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES}
+    where apply_code = #{applyCode} and apply_account = #{account}
+  </update>
+
+  <update id="updateAccount" parameterType="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    update t_r_role_apply_account
+    <set >
+    <if test="applyCode != null" >
+      apply_code = #{applyCode,jdbcType=CHAR},
+    </if>
+    <if test="applyAccount != null" >
+      apply_account = #{applyAccount,jdbcType=VARCHAR},
+    </if>
+    <if test="empName != null" >
+      emp_name = #{empName,jdbcType=VARCHAR},
+    </if>
+    <if test="empId != null" >
+      emp_id = #{empId,jdbcType=BIGINT},
+    </if>
+    <if test="empDept != null" >
+      emp_dept = #{empDept,jdbcType=VARCHAR},
+    </if>
+    <if test="operateType != null" >
+      operate_type = #{operateType,jdbcType=TINYINT},
+    </if>
+    <if test="isDelete != null" >
+      is_delete = #{isDelete,jdbcType=TINYINT},
+    </if>
+    <if test="createTime != null" >
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createEmp != null" >
+      create_emp = #{createEmp,jdbcType=BIGINT},
+    </if>
+    <if test="modifyTime != null" >
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="modifyEmp != null" >
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+    </if>
+    <if test="remark != null" >
+      remark = #{remark,jdbcType=VARCHAR},
+    </if>
+    </set>
+    where apply_code = #{applyCode} and apply_account = #{applyAccount}
+  </update>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_r_role_apply_account
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_r_role_apply_account
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    insert into t_r_role_apply_account (id, apply_code, apply_account, 
+      emp_name, emp_id, emp_dept, 
+      operate_type, is_delete, create_time, 
+      create_emp, modify_time, modify_emp, 
+      remark)
+    values (#{id,jdbcType=BIGINT}, #{applyCode,jdbcType=CHAR}, #{applyAccount,jdbcType=VARCHAR}, 
+      #{empName,jdbcType=VARCHAR}, #{empId,jdbcType=BIGINT}, #{empDept,jdbcType=VARCHAR}, 
+      #{operateType,jdbcType=TINYINT}, #{isDelete,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createEmp,jdbcType=BIGINT}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyEmp,jdbcType=BIGINT}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    insert into t_r_role_apply_account
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="applyCode != null" >
+        apply_code,
+      </if>
+      <if test="applyAccount != null" >
+        apply_account,
+      </if>
+      <if test="empName != null" >
+        emp_name,
+      </if>
+      <if test="empId != null" >
+        emp_id,
+      </if>
+      <if test="empDept != null" >
+        emp_dept,
+      </if>
+      <if test="operateType != null" >
+        operate_type,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="createEmp != null" >
+        create_emp,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="applyCode != null" >
+        #{applyCode,jdbcType=CHAR},
+      </if>
+      <if test="applyAccount != null" >
+        #{applyAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="empName != null" >
+        #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null" >
+        #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="empDept != null" >
+        #{empDept,jdbcType=VARCHAR},
+      </if>
+      <if test="operateType != null" >
+        #{operateType,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createEmp != null" >
+        #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyEmp != null" >
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    update t_r_role_apply_account
+    <set >
+      <if test="applyCode != null" >
+        apply_code = #{applyCode,jdbcType=CHAR},
+      </if>
+      <if test="applyAccount != null" >
+        apply_account = #{applyAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="empName != null" >
+        emp_name = #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null" >
+        emp_id = #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="empDept != null" >
+        emp_dept = #{empDept,jdbcType=VARCHAR},
+      </if>
+      <if test="operateType != null" >
+        operate_type = #{operateType,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createEmp != null" >
+        create_emp = #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyEmp != null" >
+        modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ucarinc.orgmanagement.entity.RoleApplyAccount" >
+    update t_r_role_apply_account
+    set apply_code = #{applyCode,jdbcType=CHAR},
+      apply_account = #{applyAccount,jdbcType=VARCHAR},
+      emp_name = #{empName,jdbcType=VARCHAR},
+      emp_id = #{empId,jdbcType=BIGINT},
+      emp_dept = #{empDept,jdbcType=VARCHAR},
+      operate_type = #{operateType,jdbcType=TINYINT},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_emp = #{createEmp,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

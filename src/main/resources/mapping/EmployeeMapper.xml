@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.EmployeeMapper" >
+
+  <sql id="Base_Column_List" >
+    e.id, e.emp_id, e.emp_name, e.emp_sex, e.emp_phone, e.emp_email, e.emp_depart, e.is_dimission, e.is_delete,
+    e.create_emp, e.create_time, e.modify_emp, e.modify_time, e.remark, a.account_login, d.dept_name, d.super_dept_id, d2.dept_name as superDepartName
+  </sql>
+
+  <!-- 通过emp_id获取员工 -->
+  <select id="getEmployeeById" resultType="com.ucarinc.orgmanagement.entity.vo.EmployeeResult" parameterType="java.lang.String" >
+    select <include refid="Base_Column_List" />
+    from ((t_b_employee e
+    left join (select * from t_b_account where is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}) a on e.emp_id = a.emp_id)
+    left join t_b_dept d on emp_depart = dept_id) left join t_b_dept d2 on d.super_dept_id = d2.dept_id
+    where e.emp_id = #{empId} and e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+
+  <!-- 插入一条新员工 -->
+  <insert id="insertEmployee" parameterType="com.ucarinc.orgmanagement.entity.Employee" >
+    insert into t_b_employee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="empId != null" >
+        emp_id,
+      </if>
+      <if test="empName != null" >
+        emp_name,
+      </if>
+      <if test="empSex != null" >
+        emp_sex,
+      </if>
+      <if test="empPhone != null" >
+        emp_phone,
+      </if>
+      <if test="empEmail != null" >
+        emp_email,
+      </if>
+      <if test="empDepart != null" >
+        emp_depart,
+      </if>
+      <if test="isDimission != null" >
+        is_dimission,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="createEmp != null" >
+        create_emp,
+      </if>
+        create_time,
+      <if test="modifyEmp != null" >
+        modify_emp,
+      </if>
+        modify_time,
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="empId != null" >
+        #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="empName != null" >
+        #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="empSex != null" >
+        #{empSex,jdbcType=BIT},
+      </if>
+      <if test="empPhone != null" >
+        #{empPhone,jdbcType=CHAR},
+      </if>
+      <if test="empEmail != null" >
+        #{empEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="empDepart != null" >
+        #{empDepart,jdbcType=CHAR},
+      </if>
+      <if test="isDimission != null" >
+        #{isDimission,jdbcType=BIT},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="createEmp != null" >
+        #{createEmp,jdbcType=BIGINT},
+      </if>
+        current_time(),
+      <if test="modifyEmp != null" >
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+        current_time(),
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <!-- 通过id修改员工 -->
+  <update id="updateEmployeeById" parameterType="com.ucarinc.orgmanagement.entity.Employee" >
+    update t_b_employee
+    <set >
+      <if test="empId != null and empId !=''" >
+        emp_id = #{empId,jdbcType=BIGINT},
+      </if>
+      <if test="empName != null and empName != ''" >
+        emp_name = #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="empSex != null" >
+        emp_sex = #{empSex,jdbcType=BIT},
+      </if>
+      <if test="empPhone != null and empPhone != ''" >
+        emp_phone = #{empPhone,jdbcType=CHAR},
+      </if>
+      <if test="empEmail != null and empEmail != ''" >
+        emp_email = #{empEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="empDepart != null and empDepart != ''" >
+        emp_depart = #{empDepart,jdbcType=CHAR},
+      </if>
+      <if test="isDimission != null" >
+        is_dimission = #{isDimission,jdbcType=BIT},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="modifyEmp != null and modifyEmp != ''" >
+        modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      </if>
+        modify_time = current_time(),
+      <if test="remark != null and remark != ''" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </update>
+
+  <!-- 通过emp_id删除员工 -->
+  <update id="deleteEmployeeById" parameterType="java.lang.String">
+    update t_b_employee set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES}
+    where emp_id = #{empId}
+  </update>
+
+  <!-- 获取员工集合(无条件或多条件) -->
+  <select id="getEmployeeList" resultType="com.ucarinc.orgmanagement.entity.vo.EmployeeResult" parameterType="com.ucarinc.orgmanagement.entity.form.EmpSearchForm">
+    select <include refid="Base_Column_List" />
+    from ((t_b_employee e
+    left join (select * from t_b_account where is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}) a on e.emp_id = a.emp_id)
+    left join t_b_dept d on emp_depart = dept_id) left join t_b_dept d2 on d.super_dept_id = d2.dept_id
+    where e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    <if test="empId != null and empId != ''">
+      and e.emp_id like concat(#{empId},'%')
+    </if>
+    <if test="empName != null and empName != ''">
+      and e.emp_name like concat(#{empName},'%')
+    </if>
+    <if test="accountLogin != null and accountLogin != ''">
+      and a.account_login like concat(#{accountLogin},'%')
+    </if>
+    <if test="accountName != null and accountName != ''">
+      and a.account_login = #{accountName}
+    </if>
+    <if test="isDimission != null">
+      and e.is_dimission = #{isDimission}
+    </if>
+    <if test="empDepart != null and empDepart != ''">
+      and e.emp_depart = #{empDepart}
+    </if>
+    <if test="superDepart != null and superDepart != ''">
+      and d.super_dept_id = #{superDepart}
+    </if>
+    <if test="grantDeptList !=null">
+      and e.emp_depart in
+      <foreach collection="grantDeptList" item="deptId" open="(" separator="," close=")">
+        #{deptId}
+      </foreach>
+    </if>
+    order by e.create_time desc
+  </select>
+
+  <!-- 通过emp_id获取员工数量(包括删除) -->
+  <select id="getEmployeeCountById" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(*) from t_b_employee where emp_id = #{empId}
+  </select>
+
+  <!-- 通过emp_id获取员工数量(不包括删除) -->
+  <select id="getCountById" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(*) from t_b_employee where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+
+  <!-- 通过emp_id修改员工状态为离职 -->
+  <update id="updateDimission" parameterType="java.lang.String">
+    update t_b_employee set is_dimission = 1
+    where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </update>
+
+  <!-- 通过emp_id修改员工状态为正常 -->
+  <update id="updateReDimission" parameterType="java.lang.String">
+    update t_b_employee set is_dimission = 0
+    where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </update>
+
+  <!-- 通过ID修改员工所属部门 -->
+  <update id="updateEmployeeDept" >
+    update t_b_employee set emp_depart = #{empDepart}
+    where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </update>
+
+  <!-- 通过部门ID获取部门名称 -->
+  <select id="getDeptNameById" resultType="java.lang.String" parameterType="java.lang.String">
+    select dept_name from t_b_dept where dept_id = #{deptId};
+  </select>
+
+  <!-- 通过账号获取员工信息 -->
+  <select id="getEmployeeByAccount" resultType="com.ucarinc.orgmanagement.entity.vo.EmployeeResult" parameterType="java.lang.String">
+    select <include refid="Base_Column_List" />
+    from ((t_b_employee e left join t_b_account a on e.emp_id = a.emp_id)
+    left join t_b_dept d on emp_depart = dept_id) left join t_b_dept d2 on d.super_dept_id = d2.dept_id
+    where a.account_login = #{accountLogin} and e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+
+  <!-- 通过员工ID获取员工姓名 -->
+  <select id="getEmpNameByEmpId" resultType="java.lang.String" parameterType="java.lang.String">
+    select emp_name from t_b_employee where emp_id = #{empId}
+  </select>
+
+  <!-- 获取无关联账号的员工数据 -->
+  <select id="getEmployeeListOnly" resultType="com.ucarinc.orgmanagement.entity.vo.EmployeeResult" parameterType="com.ucarinc.orgmanagement.entity.form.EmpSearchForm">
+    select <include refid="Base_Column_List" />
+    from ((t_b_employee e left join t_b_account a on e.emp_id = a.emp_id)
+    left join t_b_dept d on emp_depart = dept_id) left join t_b_dept d2 on d.super_dept_id = d2.dept_id
+    where e.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    and e.emp_id not in (SELECT a.emp_id from t_b_account a where a.is_link_emp = 1)
+    and e.is_dimission =0
+    <if test="empId != null and empId != ''">
+      and e.emp_id like concat(#{empId},'%')
+    </if>
+    <if test="empName != null and empName != ''">
+      and e.emp_name like concat(#{empName},'%')
+    </if>
+    <if test="accountLogin != null and accountLogin != ''">
+      and a.account_login like concat(#{accountLogin},'%')
+    </if>
+    <if test="empDepart != null and empDepart != ''">
+      and e.emp_depart = #{empDepart}
+    </if>
+    <if test="superDepart != null and superDepart != ''">
+      and d.super_dept_id = #{superDepart}
+    </if>
+    order by e.create_time desc
+  </select>
+
+  <!-- 通过员工ID修改密保邮箱 -->
+  <update id="updateAccountEmail">
+    update t_b_account set account_email = #{empEmail} where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </update>
+
+  <!-- 通过员工ID获取登陆账号 -->
+  <select id="getAccountLoginByEmpId" parameterType="java.lang.String" resultType="java.lang.String">
+    select account_login from t_b_account where emp_id = #{empId} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+
+  <!-- 通过员工ID获取账号信息 -->
+  <select id="getAccountByEmpId" parameterType="java.lang.String" resultType="com.ucarinc.orgmanagement.entity.Account">
+    select emp_id, data_permission_id, status from t_b_account where emp_id = #{empId}
+  </select>
+
+  <!-- 通过员工ID取消账号关联 -->
+  <update id="updateAccountUnBund" parameterType="java.lang.String">
+    update t_b_account set is_link_emp = 0 where emp_id = #{empId}
+  </update>
+
+  <!-- 通过员工ID删除关联账号 -->
+  <update id="deleteAccountByEmpId" parameterType="java.lang.String">
+    update t_b_account set is_delete = 1,status = 2 where emp_id = #{empId}
+  </update>
+
+  <!-- 修改关联员工编号操作 -->
+
+  <!-- 修改账号关联员工编号 -->
+  <update id="updateAccountEmpId" parameterType="java.util.Map">
+    update t_b_account set emp_id = #{newEmpId} where emp_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改部门关联员工编号 -->
+  <update id="updateDeptEmpId" parameterType="java.util.Map">
+    update t_b_dept set emp_id = #{newEmpId} where emp_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改操作历史关联员工编号 -->
+  <update id="updateOperateEmpId" parameterType="java.util.Map">
+    update t_b_operate_history set emp_id = #{newEmpId} where emp_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改角色审批员工编号 -->
+  <update id="updateRoleEmpId" parameterType="java.util.Map">
+    update t_b_role set approve_id = #{newEmpId} where approve_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改角色申请员工编号 -->
+  <update id="updateRoleApplyEmpId" parameterType="java.util.Map">
+    update t_r_role_apply set apply_emp_id = #{newEmpId} where apply_emp_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改角色关联账号的员工编号 -->
+  <update id="updateRoleAccountEmpId" parameterType="java.util.Map">
+    update t_r_role_apply_account set emp_id = #{newEmpId} where emp_id = #{oldEmpId}
+  </update>
+
+  <!-- 修改关联员工姓名操作 -->
+
+  <!-- 修改部门关联员工姓名 -->
+  <update id="updateDeptEmpName" parameterType="java.util.Map">
+    update t_b_dept set emp_name = #{newEmpName} where emp_id = #{newEmpId}
+  </update>
+
+  <!-- 修改角色关联员工姓名 -->
+  <update id="updateRoleEmpName" parameterType="java.util.Map">
+    update t_b_role set approve_name = #{newEmpName} where approve_id = #{newEmpId}
+  </update>
+
+  <!-- 修改角色申请关联员工姓名 -->
+  <update id="updateRoleApplyEmpName" parameterType="java.util.Map">
+    update t_r_role_apply set apply_emp_name = #{newEmpName} where apply_emp_id = #{newEmpId}
+  </update>
+
+  <!-- 修改角色关联账号里的员工姓名 -->
+  <update id="updateRoleAccountEmpName" parameterType="java.util.Map">
+    update t_r_role_apply_account set emp_name = #{newEmpName} where emp_id = #{newEmpId}
+  </update>
+
+  <!-- 修改关联员工部门名称 -->
+
+  <!-- 修改角色申请关联的员工部门名称 -->
+  <update id="updateRoleApplyDeptName" parameterType="java.util.Map">
+    update t_r_role_apply set apply_dept = #{newDeptName} where apply_emp_id = #{newEmpId}
+  </update>
+
+  <!-- 修改角色关联账号里的员工部门名称 -->
+  <update id="updateRoleAccountDeptName" parameterType="java.util.Map">
+    update t_r_role_apply_account set emp_dept = #{newDeptName} where emp_id = #{newEmpId}
+  </update>
+
+  <!-- 通过员工id获取员工编号 -->
+  <select id="getEmpIdById" resultType="java.lang.String" parameterType="java.lang.Long">
+    select emp_id from t_b_employee where id = #{id}
+  </select>
+
+  <!-- 通过登陆账号获取员工ID -->
+  <select id="getEmpIdByAccount" resultType="java.lang.Long">
+    select e.id from t_b_account a left join t_b_employee e on a.emp_id = e.emp_id
+    where a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO} and a.account_login = #{accountLogin}
+  </select>
+
+  <!-- 通过empId获取在职离职信息 -->
+  <select id="getDimissionByEmpId" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select is_dimission from t_b_employee where emp_id = #{empId}
+  </select>
+
+</mapper>

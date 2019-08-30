@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleLineMapper">
+  <resultMap id="RoleResultMap" type="com.ucarinc.orgmanagement.entity.RoleLine">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="role_id" jdbcType="BIGINT" property="roleId" />
+    <result column="bussiness_line_id" jdbcType="TINYINT" property="bussinessLineId" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="create_emp" jdbcType="BIGINT" property="createEmp" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_emp" jdbcType="BIGINT" property="modifyEmp" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_id, bussiness_line_id, is_delete, create_emp, create_time, modify_emp, modify_time, 
+    remark
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="RoleResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_r_role_line
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="getLineId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select
+    bussiness_line_id
+    from t_r_role_line
+    where role_id = #{roleId,jdbcType=BIGINT} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select>
+  <!-- 检查角色业务线数量 -->
+  <select id="getRoleLineCount" parameterType="java.util.Map" resultType="java.lang.Integer" >
+    select count(*) from t_r_role_line
+    where role_id = #{role.roleId} and bussiness_line_id = #{bussinessLineId}
+   </select>
+  <update id="deleteRoleLine" parameterType="java.util.Map">
+    update t_r_role_line
+    set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES}
+    where role_id = #{role.roleId,jdbcType=BIGINT}
+  </update>
+  <insert id="insert" parameterType="java.util.Map">
+     insert into t_r_role_line ( role_id, bussiness_line_id,is_delete,
+      create_emp,create_time, modify_emp, modify_time,remark)
+    values (#{role.roleId},#{bussinessLineId},#{role.isDelete},
+       #{role.createEmp,jdbcType=BIGINT},
+      current_time, #{role.modifyEmp,jdbcType=BIGINT}, current_time,
+       #{role.remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateRoleLine" parameterType="java.util.Map">
+    update t_r_role_line
+    set
+      is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO},
+      modify_emp = #{role.modifyEmp,jdbcType=BIGINT},
+      modify_time = current_time
+    where role_id = #{role.roleId,jdbcType=BIGINT} and bussiness_line_id = #{bussinessLineId,jdbcType=TINYINT}
+  </update>
+  <insert id="insertSelective" parameterType="com.ucarinc.orgmanagement.entity.RoleLine">
+    insert into t_r_role_line
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="bussinessLineId != null">
+        bussiness_line_id,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createEmp != null">
+        create_emp,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyEmp != null">
+        modify_emp,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="bussinessLineId != null">
+        #{bussinessLineId,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createEmp != null">
+        #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyEmp != null">
+        #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ucarinc.orgmanagement.entity.RoleLine">
+    update t_r_role_line
+    <set>
+      <if test="roleId != null">
+        role_id = #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="bussinessLineId != null">
+        bussiness_line_id = #{bussinessLineId,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="createEmp != null">
+        create_emp = #{createEmp,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyEmp != null">
+        modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

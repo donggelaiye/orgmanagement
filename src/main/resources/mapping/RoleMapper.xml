@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.Role">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="approve_account" property="approveAccount" jdbcType="VARCHAR"/>
+        <result column="approve_id" property="approveId" jdbcType="VARCHAR"/>
+        <result column="approve_name" property="approveName" jdbcType="VARCHAR"/>
+        <result column="approve_department" property="approveDepartment" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, role_id, role_name, approve_account, approve_id, approve_name, approve_department,
+    description, is_delete, status, create_time, create_emp, modify_time, modify_emp,
+    remark
+  </sql>
+    <sql id="Column_List">
+      a.id, ar.account_login, a.account_password, a.is_link_emp, a.emp_id, a.account_email,
+      a.data_permission_id, ar.is_delete, ar.create_emp, ar.create_time, ar.modify_emp, ar.modify_time,
+      a.status, ar.remark,e.emp_name,d.dept_name,e.emp_depart
+    </sql>
+    <select id="selectAllRoleIdAndName" resultType="com.ucarinc.orgmanagement.entity.Role">
+    select role_id,role_name from t_b_role
+    where is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    and status = 1
+  </select>
+
+    <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.Role">
+    insert into t_b_role (role_id, role_name,
+      approve_account, approve_id, approve_name,
+      approve_department, description, is_delete,
+      status, create_time, create_emp,
+      modify_time, modify_emp, remark
+      )
+    values (#{roleId,jdbcType=BIGINT}, #{roleName,jdbcType=VARCHAR},
+      #{approveAccount,jdbcType=VARCHAR}, #{approveId,jdbcType=VARCHAR}, #{approveName,jdbcType=VARCHAR},
+      #{approveDepartment,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isDelete,jdbcType=BIT},
+      #{status,jdbcType=BIT}, current_time , #{createEmp,jdbcType=BIGINT},
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyEmp,  }, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+
+    <!-- 获取角色信息 -->
+    <select id="getRoleListMes" resultType="com.ucarinc.orgmanagement.entity.Role"
+            parameterType="com.ucarinc.orgmanagement.entity.Role">
+        select
+        role_id, role_name, approve_account, approve_id, approve_name, approve_department,
+        description, status
+        from t_b_role
+        <where>
+            <if test="roleId != null and roleId !=''">
+                and role_id = #{roleId}
+            </if>
+            <if test="roleName != null and roleName !=''">
+                and role_name = #{roleName}
+            </if>
+            <if test="status != null ">
+                and status = #{status}
+            </if>
+            <if test="approveAccount != null and approveAccount !=''">
+                and approve_account = #{approveAccount}
+            </if>
+            <if test="approveId != null and approveId !=''">
+                and approve_id = #{approveId}
+            </if>
+            <if test="approveName != null and approveName !=''">
+                and approve_name = #{approveName}
+            </if>
+            <if test="approveDepartment != null and approveDepartment !=''">
+                and approve_department = #{approveDepartment}
+            </if>
+            <if test="description != null and description !=''">
+                and description = #{description}
+            </if>
+            and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        </where>
+        order by role_id
+    </select>
+
+    <!-- 获取角色数据集合 -->
+    <select id="getRoleList" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_b_role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                and role_name like #{roleName,jdbcType=VARCHAR}"%"
+            </if>
+            and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 获取状态为有效的角色数据集合 -->
+    <select id="getValidRoleList" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_b_role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                and role_name like #{roleName,jdbcType=VARCHAR}"%"
+            </if>
+            and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+            and status = 1
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 根据角色ID获取获取角色数据 -->
+    <select id="selectByRoleId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from t_b_role
+        where role_id = #{roleId,jdbcType=BIGINT} and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+    </select>
+
+    <!-- 删除角色 -->
+    <update id="deleteRole" parameterType="java.lang.Long">
+    update t_b_role
+    set status = 0
+    where role_id = #{roleId,jdbcType=BIGINT}
+  </update>
+
+    <!-- 新建角色 -->
+    <insert id="addRole" parameterType="com.ucarinc.orgmanagement.entity.Role">
+    insert into t_b_role ( role_id, role_name,
+      approve_account, approve_id, approve_name,
+      approve_department, description, is_delete,
+      status, create_time, create_emp,
+      modify_time, modify_emp, remark
+      )
+    values ( #{roleId,jdbcType=BIGINT}, #{roleName,jdbcType=VARCHAR},
+      #{approveAccount,jdbcType=VARCHAR}, #{approveId,jdbcType=VARCHAR}, #{approveName,jdbcType=VARCHAR},
+      #{approveDepartment,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isDelete,jdbcType=BIT},
+      #{status,jdbcType=BIT}, current_time, #{createEmp,jdbcType=BIGINT},
+      current_time, #{modifyEmp,  }, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+    <!-- 修改角色 -->
+    <update id="updateRole" parameterType="com.ucarinc.orgmanagement.entity.Role">
+    update t_b_role
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      approve_account = #{approveAccount,jdbcType=VARCHAR},
+      approve_id = #{approveId,jdbcType=VARCHAR},
+      approve_name = #{approveName,jdbcType=VARCHAR},
+      approve_department = #{approveDepartment,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=BIT},
+      status = #{status,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_emp = #{createEmp,jdbcType=BIGINT},
+      modify_time = current_time,
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR}
+    where role_id = #{roleId,jdbcType=BIGINT}
+  </update>
+
+    <!-- 获取角色数量 -->
+    <select id="getRoleCount" resultType="java.lang.Integer">
+    select count(*) from t_b_role
+  </select>
+
+    <!-- 检查角色名是否存在 -->
+    <select id="getRoleNameCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(*) from t_b_role where role_name = #{roleName}
+  </select>
+
+    <!-- 检查角色是否存在 -->
+    <select id="checkRoleStatus" resultType="java.lang.Byte" parameterType="java.lang.Long">
+    select status from t_b_role where role_id = #{roleId}
+  </select>
+
+    <!-- 检查审批人账号是否存在 -->
+    <select id="checkApproveAccount" resultType="java.lang.Byte" parameterType="java.lang.String">
+    select is_delete from t_b_account
+    where account_login = #{accountLogin}
+  </select>
+
+    <!-- 检查审批人账号是否变更 -->
+    <select id="checkApproveAccountChange" resultType="com.ucarinc.orgmanagement.entity.form.ApproveAccountForm" parameterType="java.lang.String">
+    select a.is_delete,a.emp_id,e.emp_name,d.dept_name as dept_name from t_b_account a
+    left join t_b_employee e on a.emp_id = e.emp_id
+    left join t_b_dept d on d.dept_id = e.emp_depart
+    where account_login = #{accountLogin}
+  </select>
+
+    <!-- 获取角色关联账号数据集合 -->
+    <select id="getRoleAccountLists" parameterType="com.ucarinc.orgmanagement.entity.form.RoleAccountForm"
+            resultType="com.ucarinc.orgmanagement.entity.form.AccountForm">
+        select raa.apply_account as account_login,raa.emp_id,raa.emp_name,raa.emp_dept as dept_name,
+        raa.operate_type dataPermissionId,a.status,raa.modify_time,e.emp_name as modify_emp
+        from t_r_role_apply ra left join t_r_role_apply_account raa on ra.apply_code = raa.apply_code
+        left join t_b_account a on a.account_login = raa.apply_account
+        left join t_b_employee e on e.emp_id = raa.modify_emp
+        <where>
+            raa.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+            and ra.role_id = #{roleId}
+            <if test="accountLogin != null and accountLogin != ''">
+                and account_login like concat(#{accountLogin},'%')
+            </if>
+        </where>
+        order by raa.create_time desc
+    </select>
+
+    <!--查询角色账号-->
+    <select id="getRoleAccountList" parameterType="com.ucarinc.orgmanagement.entity.form.RoleAccountForm"
+            resultType="com.ucarinc.orgmanagement.entity.vo.AccountResult">
+        select
+        <include refid="Column_List"/>
+        from t_r_account_role ar
+        left join t_b_role r on r.role_id = ar.role_id
+        left join t_b_account a on a.account_login = ar.account_login
+        left join t_b_employee e on a.emp_id = e.emp_id
+        left join t_b_dept d on e.emp_depart = d.dept_id
+        where ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and ar.role_id = #{roleId}
+        <if test="accountLogin != null and accountLogin != ''">
+            and ar.account_login like concat(#{accountLogin},'%')
+        </if>
+        order by a.modify_time desc
+    </select>
+
+    <!--删除角色账号-->
+    <update id="deleteRoleAccount" parameterType="java.util.Map">
+      update t_r_account_role
+       set
+          modify_emp = #{modifyEmp,jdbcType=BIGINT},
+          modify_time = current_time ,
+          is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES}
+      where role_id = #{roleId} and account_login = #{accountLogin}
+    </update>
+    <!-- 检查角色账号数量 -->
+    <select id="getRoleAccountCount" parameterType="java.util.Map" resultType="java.lang.Integer" >
+    select count(*) from t_r_account_role
+    where role_id = #{roleId} and account_login = #{accountLogin}
+     </select>
+
+   <!-- 改变角色账号状态-->
+    <update id="updateRoleAccount" parameterType="java.util.Map">
+      update t_r_account_role
+       set
+          modify_emp = #{modifyEmp,jdbcType=BIGINT},
+          modify_time = current_time ,
+          is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+      where role_id = #{roleId} and account_login = #{accountLogin}
+    </update>
+
+    <!-- 新建角色账号 -->
+    <insert id="addRoleAccount" parameterType="com.ucarinc.orgmanagement.entity.Role">
+    insert into t_r_account_role ( role_id,
+      account_login, is_delete,
+      create_time, create_emp,
+      modify_time, modify_emp, remark
+      )
+    values ( #{roleId,jdbcType=BIGINT}, #{accountLogin,jdbcType=VARCHAR},
+      ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO},
+      current_time, #{modifyEmp},
+      current_time, #{modifyEmp}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+</mapper>

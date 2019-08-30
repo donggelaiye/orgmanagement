@@ -1,0 +1,82 @@
+/**除了引用elementUI样式外，页面需要的新的样式在此定义 */
+
+.list-container{
+  margin-top: 30px;
+}
+
+.el-input{
+  width: 170px;
+}
+
+.el-button{
+  opacity: 0.8;
+  display: inline-block;
+  box-shadow: rgba(255,255,255,0.25) 0px 1px 0px, inset rgba(255,255,255,0.25) 0px 1px 0px, inset rgba(0,0,0,0.25) 0px 0px 0px, inset rgba(255,255,255,0.03) 0px 20px 0px, inset rgba(0,0,0,0.15) 0px -20px 20px, inset rgba(255,255,255,0.05) 0px 20px 20px;
+}
+
+.margin-top20{
+  margin-top: 20px;
+}
+
+.margin-left20{
+  margin-left: 20px;
+}
+
+.margin-top50{
+  margin-top: 50px;
+}
+
+.margin-left60{
+  margin-left: 60px;
+}
+
+.margin-left50{
+  margin-left: 50px;
+}
+
+.margin-left70{
+  margin-left: 70px;
+}
+
+.table—style{
+  width: 96%;
+  margin-left: 15px;
+}
+
+.font-title{
+  color: darkgrey;
+}
+
+.login{
+  width: 100%;
+  height: 636px;
+  position: relative;
+  background-size: cover;
+  background: url(../assets/login_bg.jpg) center bottom no-repeat;
+}
+
+.login-form{
+  background-color: #ffffff;
+  padding-bottom: 20px;
+  border-radius:20px;
+  opacity: 0.9;
+  box-shadow: 10px 10px 10px gray;
+}
+
+.login-button{
+  width: 230px;
+}
+
+.login-msg {
+  font-size: 14px;
+  color: red;
+}
+.header-btn:hover {
+  cursor:pointer;
+  background-color: #167FD5;
+}
+
+th.el-table-column--selection div.cell {
+  display: none;
+}
+

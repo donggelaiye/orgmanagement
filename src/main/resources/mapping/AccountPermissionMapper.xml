@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.AccountPermissionMapper" >
+    <select id="getAccountPermissionList" resultType="com.ucarinc.orgmanagement.entity.AccountPermission" parameterType="com.ucarinc.orgmanagement.entity.AccountPermission" >
+        select a.account_login,a.emp_id,b.emp_name,c.dept_name,a.status,GROUP_CONCAT(e.resource_id  SEPARATOR ';') AS permission_id
+
+        from t_r_account_resource d left join t_b_account a on a.account_login = d.account_login
+        left join t_b_employee b on a.emp_id = b.emp_id
+        left join t_b_dept c on b.emp_depart = c.dept_id
+        left join t_b_resource e on d.resource_id = e.resource_id
+        <where>
+            <if test="accountLogin != null and accountLogin !=''">
+                and a.account_login like concat(#{accountLogin},'%')
+            </if>
+            <if test="empId != null and empId !=''">
+                and a.emp_id like concat(#{empId},'%')
+            </if>
+            <if test="empName != null and empName !=''">
+                and b.emp_name like concat(#{empName},'%')
+            </if>
+            <if test="deptName != null and deptName !=''">
+                and c.dept_name = #{deptName}
+            </if>
+            <if test="status != null ">
+                and a.status = #{status}
+            </if>
+            <if test="resourceId != null ">
+                and e.resource_id = #{resourceId}
+            </if>
+        </where>
+        group by a.account_login
+        order by a.create_time DESC
+    </select>
+
+    <select id="getPermissionNameByResourceId" resultType="java.lang.String" parameterType="java.lang.String" >
+        select permission_name from t_b_resource where resource_id = #{resourceId}
+    </select>
+</mapper>

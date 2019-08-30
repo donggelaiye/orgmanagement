@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleApplyMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.RoleApply">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="apply_code" property="applyCode" jdbcType="CHAR"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="role_approve_name" property="roleApproveName" jdbcType="VARCHAR"/>
+        <result column="bussiness_line" property="bussinessLine" jdbcType="VARCHAR"/>
+        <result column="apply_account_login" property="applyAccountLogin" jdbcType="VARCHAR"/>
+        <result column="apply_emp_id" property="applyEmpId" jdbcType="BIGINT"/>
+        <result column="apply_emp_name" property="applyEmpName" jdbcType="VARCHAR"/>
+        <result column="apply_dept" property="applyDept" jdbcType="VARCHAR"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="operate_emp" property="operateEmp" jdbcType="VARCHAR"/>
+        <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="approve_account_name" property="approveAccountName" jdbcType="VARCHAR"/>
+        <result column="approve_time" property="approveTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_account_name" property="modifyAccountName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="approve_comment" property="approveComment" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, apply_code, role_id, role_name, role_approve_name, bussiness_line, apply_account_login, 
+    apply_emp_id, apply_emp_name, apply_dept, is_delete, operate_emp, operate_time, status, 
+    approve_account_name, approve_time, modify_account_name, create_time, create_emp, 
+    modify_time, modify_emp, remark,approve_comment
+  </sql>
+    <select id="getRoleApplyByApplyCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from t_r_role_apply
+        where apply_code = #{applyCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="query" parameterType="com.ucarinc.orgmanagement.entity.form.RoleApplySearchForm"
+            resultMap="BaseResultMap">
+        select
+        ra.id,
+        ra.apply_code,
+        ra.role_id,
+        ra.role_name,
+        ra.role_approve_name,
+        ra.bussiness_line,
+        ra.apply_account_login,
+        ra.apply_emp_id,
+        ra.apply_emp_name,
+        ra.apply_dept,
+        ra.operate_emp,
+        ra.operate_time,
+        ra.`status`,
+        ra.approve_account_name,
+        ra.approve_comment,
+        ra.approve_time,
+        ra.modify_account_name,
+        ra.modify_emp,
+        ra.modify_time,
+        ra.is_delete,
+        ra.create_time,
+        ra.create_emp,
+        ra.approve_comment
+        FROM
+        t_r_role_apply ra
+        LEFT JOIN t_b_role r ON ra.role_id = r.role_id
+        LEFT JOIN t_b_employee e on ra.apply_emp_id = e.emp_id
+        left JOIN t_b_employee e2 on e2.emp_id = r.approve_id
+        <where>
+            <if test="applyCode != null and applyCode != ''">
+                ra.apply_code LIKE CONCAT(#{applyCode},'%')
+            </if>
+            <trim prefix="AND (" suffix=")" prefixOverrides="OR ">
+                <if test="account != null and account != ''">
+                     r.approve_account = #{account} or ra.apply_account_login = #{account}
+                </if>
+            </trim>
+            <if test="status != null ">
+                and ra.status = #{status}
+            </if>
+            <if test="applyAccountLogin != null and applyAccountLogin != ''">
+                and ra.apply_account_login LIKE CONCAT(#{applyAccountLogin},'%')
+            </if>
+            <if test="roleId != null and roleId != ''">
+                and ra.role_id LIKE CONCAT(#{roleId},'%')
+            </if>
+            <if test="roleName != null and roleName != ''">
+                and ra.role_name LIKE CONCAT(#{roleName},'%')
+            </if>
+            <if test="roleApproveName != null and roleApproveName != ''">
+                and ra.role_approve_name LIKE CONCAT(#{roleApproveName},'%')
+            </if>
+            <if test="applyEmpId != null and applyEmpId != ''">
+                and ra.apply_emp_id LIKE CONCAT(#{applyEmpId},'%')
+            </if>
+            <if test="applyEmpName != null and applyEmpName != ''">
+                and ra.apply_emp_name LIKE CONCAT(#{applyEmpName},'%')
+            </if>
+            <if test="applyDept != null and applyDept != ''">
+                and ra.apply_dept LIKE CONCAT(#{applyDept},'%')
+            </if>
+            <if test="applyTimeStart != null ">
+                and ra.create_time > #{applyTimeStart}
+            </if>
+            <if test="applyTimeEnd != null ">
+                <![CDATA[ and ra.create_time < #{applyTimeEnd}]]>
+            </if>
+            <if test="operateTimeStart != null ">
+                and ra.operate_time > #{operateTimeStart}
+            </if>
+            <if test="operateTimeEnd != null ">
+                <![CDATA[ and ra.operate_time < #{operateTimeEnd} ]]>
+            </if>
+
+            <trim prefix="AND (" suffix=")" prefixOverrides="OR ">
+                <if test="grantDeptList !=null">
+                     e.emp_depart in
+                    <foreach collection="grantDeptList" item="deptId" open="(" separator="," close=")">
+                        #{deptId}
+                    </foreach>
+                     or e2.emp_depart in
+                    <foreach collection="grantDeptList" item="deptId" open="(" separator="," close=")">
+                        #{deptId}
+                    </foreach>
+                </if>
+            </trim>
+
+        </where>
+        ORDER BY operate_time DESC
+    </select>
+
+    <select id="getBussinessNameByRoleId" parameterType="java.lang.Long" resultType="java.lang.String">
+
+        SELECT
+            GROUP_CONCAT(b.bussiness_line_name SEPARATOR ';') AS bussinessName
+        FROM
+            t_r_role_line r
+        LEFT JOIN t_b_bussiness_line b ON r.bussiness_line_id = b.bussiness_line_id
+        WHERE
+            r.role_id = #{roleId}
+  </select>
+
+    <update id="updateRoleApplyByRoleCode" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+        update t_r_role_apply
+        <set>
+            <if test="applyCode != null">
+                apply_code = #{applyCode,jdbcType=CHAR},
+            </if>
+            <if test="roleId != null">
+                role_id = #{roleId,jdbcType=BIGINT},
+            </if>
+            <if test="roleName != null">
+                role_name = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="roleApproveName != null">
+                role_approve_name = #{roleApproveName,jdbcType=VARCHAR},
+            </if>
+            <if test="bussinessLine != null">
+                bussiness_line = #{bussinessLine,jdbcType=VARCHAR},
+            </if>
+            <if test="applyAccountLogin != null">
+                apply_account_login = #{applyAccountLogin,jdbcType=VARCHAR},
+            </if>
+            <if test="applyEmpId != null">
+                apply_emp_id = #{applyEmpId,jdbcType=BIGINT},
+            </if>
+            <if test="applyEmpName != null">
+                apply_emp_name = #{applyEmpName,jdbcType=VARCHAR},
+            </if>
+            <if test="applyDept != null">
+                apply_dept = #{applyDept,jdbcType=VARCHAR},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete,jdbcType=TINYINT},
+            </if>
+            <if test="operateEmp != null">
+                operate_emp = #{operateEmp,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                operate_time = #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="approveAccountName != null">
+                approve_account_name = #{approveAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="approveTime != null">
+                approve_time = #{approveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyAccountName != null">
+                modify_account_name = #{modifyAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createEmp != null">
+                create_emp = #{createEmp,jdbcType=BIGINT},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyEmp != null">
+                modify_emp = #{modifyEmp,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where apply_code = #{applyCode,jdbcType=BIGINT}
+    </update>
+
+    <select id="getApplyCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select
+    count(*)
+    from t_r_role_apply
+    where apply_code like CONCAT(#{codePrefix},'%')
+  </select>
+
+    <update id="deleteRoleApply" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+        update t_r_role_apply
+        <set>
+            <if test="isDelete != null">
+                is_delete = #{isDelete,jdbcType=TINYINT},
+            </if>
+            <if test="operateEmp != null">
+                operate_emp = #{operateEmp,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                operate_time = #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="modifyAccountName != null">
+                modify_account_name = #{modifyAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyEmp != null">
+                modify_emp = #{modifyEmp,jdbcType=BIGINT},
+            </if>
+        </set>
+        where apply_code = #{applyCode}
+    </update>
+
+    <update id="updateStatusByApplyCode">
+        update t_r_role_apply
+        set status =  #{status}
+        where apply_code = #{applyCode}
+    </update>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from t_r_role_apply
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_r_role_apply
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+    insert into t_r_role_apply (id, apply_code, role_id, 
+      role_name, role_approve_name, bussiness_line, 
+      apply_account_login, apply_emp_id, apply_emp_name, 
+      apply_dept, is_delete, operate_emp, 
+      operate_time, status, approve_account_name, 
+      approve_time, modify_account_name, create_time, 
+      create_emp, modify_time, modify_emp, 
+      remark)
+    values (#{id,jdbcType=BIGINT}, #{applyCode,jdbcType=CHAR}, #{roleId,jdbcType=BIGINT}, 
+      #{roleName,jdbcType=VARCHAR}, #{roleApproveName,jdbcType=VARCHAR}, #{bussinessLine,jdbcType=VARCHAR}, 
+      #{applyAccountLogin,jdbcType=VARCHAR}, #{applyEmpId,jdbcType=BIGINT}, #{applyEmpName,jdbcType=VARCHAR}, 
+      #{applyDept,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT}, #{operateEmp,jdbcType=VARCHAR}, 
+      #{operateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=TINYINT}, #{approveAccountName,jdbcType=VARCHAR}, 
+      #{approveTime,jdbcType=TIMESTAMP}, #{modifyAccountName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createEmp,jdbcType=BIGINT}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyEmp,jdbcType=BIGINT}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+        insert into t_r_role_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="applyCode != null">
+                apply_code,
+            </if>
+            <if test="roleId != null">
+                role_id,
+            </if>
+            <if test="roleName != null">
+                role_name,
+            </if>
+            <if test="roleApproveName != null">
+                role_approve_name,
+            </if>
+            <if test="bussinessLine != null">
+                bussiness_line,
+            </if>
+            <if test="applyAccountLogin != null">
+                apply_account_login,
+            </if>
+            <if test="applyEmpId != null">
+                apply_emp_id,
+            </if>
+            <if test="applyEmpName != null">
+                apply_emp_name,
+            </if>
+            <if test="applyDept != null">
+                apply_dept,
+            </if>
+            <if test="isDelete != null">
+                is_delete,
+            </if>
+            <if test="operateEmp != null">
+                operate_emp,
+            </if>
+            <if test="operateTime != null">
+                operate_time,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="approveAccountName != null">
+                approve_account_name,
+            </if>
+            <if test="approveTime != null">
+                approve_time,
+            </if>
+            <if test="modifyAccountName != null">
+                modify_account_name,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createEmp != null">
+                create_emp,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="modifyEmp != null">
+                modify_emp,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="applyCode != null">
+                #{applyCode,jdbcType=CHAR},
+            </if>
+            <if test="roleId != null">
+                #{roleId,jdbcType=BIGINT},
+            </if>
+            <if test="roleName != null">
+                #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="roleApproveName != null">
+                #{roleApproveName,jdbcType=VARCHAR},
+            </if>
+            <if test="bussinessLine != null">
+                #{bussinessLine,jdbcType=VARCHAR},
+            </if>
+            <if test="applyAccountLogin != null">
+                #{applyAccountLogin,jdbcType=VARCHAR},
+            </if>
+            <if test="applyEmpId != null">
+                #{applyEmpId,jdbcType=BIGINT},
+            </if>
+            <if test="applyEmpName != null">
+                #{applyEmpName,jdbcType=VARCHAR},
+            </if>
+            <if test="applyDept != null">
+                #{applyDept,jdbcType=VARCHAR},
+            </if>
+            <if test="isDelete != null">
+                #{isDelete,jdbcType=TINYINT},
+            </if>
+            <if test="operateEmp != null">
+                #{operateEmp,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="approveAccountName != null">
+                #{approveAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="approveTime != null">
+                #{approveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyAccountName != null">
+                #{modifyAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createEmp != null">
+                #{createEmp,jdbcType=BIGINT},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyEmp != null">
+                #{modifyEmp,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+        update t_r_role_apply
+        <set>
+            <if test="applyCode != null">
+                apply_code = #{applyCode,jdbcType=CHAR},
+            </if>
+            <if test="roleId != null">
+                role_id = #{roleId,jdbcType=BIGINT},
+            </if>
+            <if test="roleName != null">
+                role_name = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="roleApproveName != null">
+                role_approve_name = #{roleApproveName,jdbcType=VARCHAR},
+            </if>
+            <if test="bussinessLine != null">
+                bussiness_line = #{bussinessLine,jdbcType=VARCHAR},
+            </if>
+            <if test="applyAccountLogin != null">
+                apply_account_login = #{applyAccountLogin,jdbcType=VARCHAR},
+            </if>
+            <if test="applyEmpId != null">
+                apply_emp_id = #{applyEmpId,jdbcType=BIGINT},
+            </if>
+            <if test="applyEmpName != null">
+                apply_emp_name = #{applyEmpName,jdbcType=VARCHAR},
+            </if>
+            <if test="applyDept != null">
+                apply_dept = #{applyDept,jdbcType=VARCHAR},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete,jdbcType=TINYINT},
+            </if>
+            <if test="operateEmp != null">
+                operate_emp = #{operateEmp,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                operate_time = #{operateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="approveAccountName != null">
+                approve_account_name = #{approveAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="approveTime != null">
+                approve_time = #{approveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyAccountName != null">
+                modify_account_name = #{modifyAccountName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createEmp != null">
+                create_emp = #{createEmp,jdbcType=BIGINT},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyEmp != null">
+                modify_emp = #{modifyEmp,jdbcType=BIGINT},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ucarinc.orgmanagement.entity.RoleApply">
+    update t_r_role_apply
+    set apply_code = #{applyCode,jdbcType=CHAR},
+      role_id = #{roleId,jdbcType=BIGINT},
+      role_name = #{roleName,jdbcType=VARCHAR},
+      role_approve_name = #{roleApproveName,jdbcType=VARCHAR},
+      bussiness_line = #{bussinessLine,jdbcType=VARCHAR},
+      apply_account_login = #{applyAccountLogin,jdbcType=VARCHAR},
+      apply_emp_id = #{applyEmpId,jdbcType=BIGINT},
+      apply_emp_name = #{applyEmpName,jdbcType=VARCHAR},
+      apply_dept = #{applyDept,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      operate_emp = #{operateEmp,jdbcType=VARCHAR},
+      operate_time = #{operateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=TINYINT},
+      approve_account_name = #{approveAccountName,jdbcType=VARCHAR},
+      approve_time = #{approveTime,jdbcType=TIMESTAMP},
+      modify_account_name = #{modifyAccountName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_emp = #{createEmp,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_emp = #{modifyEmp,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+    <!-- 获取员工数据集合 -->
+    <select id="getRoleApplyList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_r_role_apply
+    </select>
+
+
+</mapper>

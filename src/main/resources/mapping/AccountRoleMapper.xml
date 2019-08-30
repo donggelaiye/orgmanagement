@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.AccountRoleMapper">
+    <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.AccountRole">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="account_login" property="accountLogin" jdbcType="VARCHAR"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="is_delete" property="isDelete" jdbcType="TINYINT"/>
+        <result column="create_emp" property="createEmp" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, account_login, role_id, is_delete, create_emp, create_time, modify_emp, modify_time,
+        remark
+    </sql>
+    <insert id="batchInsert">
+        insert into t_r_account_role (id, account_login, role_id,
+        is_delete, create_emp, create_time,
+        modify_emp, modify_time, remark
+        )
+        values
+        <foreach collection="accountRoleList" item="role" separator=",">
+            (
+            #{role.id,jdbcType=BIGINT}, #{role.accountLogin,jdbcType=VARCHAR}, #{role.roleId,jdbcType=BIGINT},
+            #{role.isDelete,jdbcType=TINYINT}, #{role.createEmp,jdbcType=BIGINT}, #{role.createTime,jdbcType=TIMESTAMP},
+            #{role.modifyEmp,jdbcType=BIGINT}, #{role.modifyTime,jdbcType=TIMESTAMP}, #{role.remark,jdbcType=VARCHAR}
+            )
+        </foreach>
+        on duplicate key update
+        is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO},
+        modify_time = NOW(),
+        modify_emp = #{modifyEmpId}
+    </insert>
+    <update id="batchLogicalDelete">
+        update t_r_account_role
+        set is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_YES},
+        modify_emp = #{modifyEmpId},
+        modify_time = NOW()
+        where account_login = #{loginAccount} and role_id in
+        <foreach collection="roleIdList" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </update>
+    <select id="selectAccountRoleIdListByLoginAccount" resultType="java.lang.Long">
+        SELECT ar.role_id FROM t_b_account a
+        JOIN t_r_account_role ar ON a.account_login = ar.account_login
+        JOIN  t_b_role r on ar.role_id = r.role_id
+        WHERE ar.account_login = #{loginAccount}
+            AND ar.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+            AND a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+            AND r.status = 1
+    </select>
+
+
+</mapper>

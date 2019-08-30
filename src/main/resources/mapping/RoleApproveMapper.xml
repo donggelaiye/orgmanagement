@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucarinc.orgmanagement.dao.RoleApproveMapper" >
+  <resultMap id="BaseResultMap" type="com.ucarinc.orgmanagement.entity.RoleApprove" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="apply_code" property="applyCode" jdbcType="CHAR" />
+    <result column="role_id" property="roleId" jdbcType="BIGINT" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="role_approve_name" property="roleApproveName" jdbcType="VARCHAR" />
+    <result column="bussiness_line" property="bussinessLine" jdbcType="VARCHAR" />
+    <result column="apply_account_login" property="applyAccountLogin" jdbcType="VARCHAR" />
+    <result column="apply_emp_id" property="applyEmpId" jdbcType="BIGINT" />
+    <result column="apply_emp_name" property="applyEmpName" jdbcType="VARCHAR" />
+    <result column="apply_dept" property="applyDept" jdbcType="VARCHAR" />
+    <result column="is_delete" property="isDelete" jdbcType="TINYINT" />
+    <result column="operate_emp" property="operateEmp" jdbcType="VARCHAR" />
+    <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="approve_account_name" property="approveAccountName" jdbcType="VARCHAR" />
+    <result column="approve_time" property="approveTime" jdbcType="TIMESTAMP" />
+    <result column="modify_account_name" property="modifyAccountName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_emp" property="createEmp" jdbcType="BIGINT" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modify_emp" property="modifyEmp" jdbcType="BIGINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, apply_code, role_id, role_name, role_approve_name, bussiness_line, apply_account_login, 
+    apply_emp_id, apply_emp_name, apply_dept, is_delete, operate_emp, operate_time, status, 
+    approve_account_name, approve_time, modify_account_name, create_time, create_emp, 
+    modify_time, modify_emp, remark
+  </sql>
+  <!-- 获取角色申请审核数据集合 -->
+  <select id="getRoleApproveList" resultType="com.ucarinc.orgmanagement.entity.form.RoleApproveForm" parameterType="com.ucarinc.orgmanagement.entity.form.RoleApproveForm" >
+    select 
+    a.apply_code,a.role_id,a.role_name,a.role_approve_name,a.bussiness_line,a.apply_account_login,
+    a.apply_emp_id, a.apply_emp_name, a.apply_dept, a.create_time,a.operate_emp, a.operate_time, a.status
+    from t_r_role_apply a LEFT JOIN t_b_role b on a.role_id = b.role_id
+    <where>
+      <if test="applyCode != null and applyCode !=''">
+        and a.apply_code LIKE CONCAT(#{applyCode},'%')
+      </if>
+      <if test="roleId != null ">
+        and a.role_id LIKE CONCAT(#{roleId},'%')
+      </if>
+      <if test="roleName != null and roleName !=''">
+        and a.role_name LIKE CONCAT(#{roleName},'%')
+      </if>
+      <if test="applyAccountLogin != null and applyAccountLogin !=''">
+        and a.apply_account_login LIKE CONCAT(#{applyAccountLogin},'%')
+      </if>
+      <if test="applyEmpId != null ">
+        and a.apply_emp_id LIKE CONCAT(#{applyEmpId},'%')
+      </if>
+      <if test="applyEmpName != null and applyEmpName !=''">
+        and a.apply_emp_name LIKE CONCAT(#{applyEmpName},'%')
+      </if>
+      <if test="applyDept != null and applyDept !=''">
+        and a.apply_dept = #{applyDept}
+      </if>
+      <if test="applyTimeStart != null ">
+        and a.create_time > #{applyTimeStart}
+      </if>
+      <if test="applyTimeEnd != null ">
+        <![CDATA[ and a.create_time < #{applyTimeEnd}]]>
+      </if>
+      <if test="operateTimeStart != null ">
+        and a.operate_time > #{operateTimeStart}
+      </if>
+      <if test="operateTimeEnd != null ">
+        <![CDATA[ and a.operate_time < #{operateTimeEnd} ]]>
+      </if>
+        and a.status = 1
+        and a.is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+        and b.approve_account = #{accountLogin}
+    </where>
+        order by operate_time
+  </select>
+  <!-- 审核拒绝，更新角色申请表状态 -->
+  <update id="approveRefuse" parameterType="com.ucarinc.orgmanagement.entity.RoleApprove">
+    update t_r_role_apply
+    <set>
+        status = 3,
+        approve_time = now(),
+        approve_account_name = #{approveAccountName},
+        operate_time = now(),
+        operate_emp = #{approveAccountName},
+      <if test="approveComment != null">
+        approve_comment = #{approveComment,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where apply_code = #{applyCode}
+  </update>
+  <!-- 审核通过，更新角色申请表状态 -->
+  <update id="updateAgreeStatus" parameterType="com.ucarinc.orgmanagement.entity.RoleApprove">
+    update t_r_role_apply
+    <set>
+      status = 2,
+      approve_time = now(),
+      approve_account_name = #{approveAccountName},
+      operate_time = now(),
+      operate_emp = #{approveAccountName},
+    </set>
+    where apply_code = #{applyCode}
+  </update>
+  <!-- 审核通过，插入角色申请成功的对应账户 -->
+  <insert id="insertAgreeAccount" parameterType="com.ucarinc.orgmanagement.entity.AccountRole">
+    insert into t_r_account_role ( account_login, role_id,
+       is_delete, create_emp, create_time,
+       modify_emp, modify_time)
+    values(#{accountLogin},#{roleId},#{isDelete},#{createEmp},
+            #{createTime},#{modifyEmp},#{modifyTime})
+ </insert>
+  <!-- 审核通过，更新角色申请成功的对应账户 -->
+  <update id="updateAgreeAccount" parameterType="com.ucarinc.orgmanagement.entity.AccountRole">
+    update t_r_account_role
+    set is_delete=0
+    where role_id = #{roleId} and account_login = #{accountLogin}
+  </update>
+  <!-- 审核通过，移除角色申请成功的对应账户 -->
+  <update id="deleteAgreeAccount" parameterType="com.ucarinc.orgmanagement.entity.AccountRole">
+    update t_r_account_role
+    set is_delete=1
+    where role_id = #{roleId} and account_login = #{accountLogin}
+  </update>
+  <!-- 审核通过，查询角色账号表中是否有对应数据 -->
+  <select id="getCount" resultType="java.lang.Integer" parameterType="com.ucarinc.orgmanagement.entity.AccountRole">
+     SELECT COUNT(*)
+     FROM t_r_account_role
+     WHERE role_id = #{roleId} and account_login = #{accountLogin}
+     and is_delete = ${@com.ucarinc.orgmanagement.common.Constant@IS_DELETED_NO}
+  </select >
+</mapper>
